@@ -11,7 +11,14 @@ public class PlayerInput : MonoBehaviour
     private GameObject selectedBlock1, selectedBlock2; // 存储选中的两个方块
 
     private System.Random random = new System.Random();
+    int boardSize;
+    bool[,] matched;
+    private void Start()
+    {
+        BoardManager boardManager = new BoardManager();
+        boardSize = boardManager.boardSize;
 
+    }
     private void Update()
     {
         // 检测鼠标点击

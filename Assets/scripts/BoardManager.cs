@@ -1,6 +1,4 @@
 using UnityEngine;
-using System.Collections.Generic;
-using System;
 
 public class BoardManager : MonoBehaviour
 {
@@ -191,5 +189,5 @@ public class BoardManager : MonoBehaviour
         }
     }
 
-    
+
 }

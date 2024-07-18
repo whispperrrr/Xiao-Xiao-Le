@@ -1,26 +1,24 @@
-using System.Collections;
-using System.Collections.Generic;
 using System.IO;
 using UnityEngine;
-using UnityEngine.UI; 
+using UnityEngine.UI;
 
 public class FindLatestScore : MonoBehaviour
 {
-    public Text scoreText; 
+    public Text scoreText;
 
     void Start()
     {
-        string filePath = Path.Combine(Application.streamingAssetsPath, "输入文本名"); 
+        string filePath = Path.Combine(Application.streamingAssetsPath, "输入文本名");
         string latestScoreLine = null;
-        int latestScore = 0; 
+        int latestScore = 0;
 
         using (StreamReader reader = new StreamReader(filePath))
         {
             string line;
-            
+
             while ((line = reader.ReadLine()) != null)
             {
-                latestScoreLine = line;  
+                latestScoreLine = line;
             }
 
             if (latestScoreLine != null)
@@ -42,5 +40,5 @@ public class FindLatestScore : MonoBehaviour
         }
     }
 
-  
+
 }

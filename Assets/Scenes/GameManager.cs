@@ -1,8 +1,6 @@
-using System.Collections;
-using System.Collections.Generic;
 using UnityEngine;
-using UnityEngine.UI;
 using UnityEngine.SceneManagement;
+using UnityEngine.UI;
 
 public class GameManager : MonoBehaviour
 {
@@ -53,7 +51,7 @@ public class GameManager : MonoBehaviour
                 EndGame();
             }
         }
-       
+
         void StartGame()
         {
             // 开始游戏按钮的点击事件（如果有）
