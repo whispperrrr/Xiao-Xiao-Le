@@ -1,28 +1,43 @@
 using System.Collections.Generic;
 using System.Drawing;
+using TMPro;
 using UnityEngine;
+using System;
 
 public class GridManager : MonoBehaviour
 {
     public GameObject[] elementPrefabs; // 预制体数组
-    public static int rows = 12;
-    public static int columns = 12;
+    public static int rows = 9;
+    public static int columns = 9;
     public float spacing = 1.0f;
-
+    private TMP_Text scoreText;
+    private TMP_Text timeText;
     GameObject[,] gameObjects = new GameObject[rows, columns];
     private GameObject firstSelected;
     private GameObject secondSelected;
     public UnityEngine.Color selectedColor = UnityEngine.Color.red;
     private UnityEngine.Color originalColor;
 
+    float time = 30f;
     void Start()
     {
+        scoreText = GameObject.Find("scoreText").GetComponent<TMP_Text>();
+        timeText = GameObject.Find("timeText").GetComponent<TMP_Text>();
         GenerateGrid();
 
     }
 
     private void Update()
     {
+        time -= Time.deltaTime;
+
+        if (time < 0)
+        {
+            Application.Quit();
+        }
+
+        int val = (int)Math.Floor(time);
+        timeText.text = "Time:"+val.ToString();
         if (Input.GetMouseButtonDown(0))
         {
             SelectElement();
@@ -182,6 +197,11 @@ public class GridManager : MonoBehaviour
             foreach (Point p in objectsToDestroyH)
             {
                 desEle(p);
+                if(obj!=null) 
+                Destroy(obj);
+                // 增加分数
+                int score = int.Parse(scoreText.text.Substring(6)) + 1;
+                scoreText.SetText(string.Concat("Score:", score.ToString()));
             }
         }
 
@@ -189,6 +209,9 @@ public class GridManager : MonoBehaviour
         {
             if(gameObject!=null)
             Destroy(gameObject);
+            // 增加分数
+            int score = int.Parse(scoreText.text.Substring(6)) + 1;
+            scoreText.SetText(string.Concat("Score:", score.ToString()));
         }
     }
 
@@ -231,7 +254,7 @@ public class GridManager : MonoBehaviour
         {
             for (int y = 0; y < rows; y++)
             {
-                int randomIndex = Random.Range(0, elementPrefabs.Length);
+                int randomIndex = UnityEngine.Random.Range(0, elementPrefabs.Length);
                 GameObject element = Instantiate(elementPrefabs[randomIndex], transform);
                 gameObjects[y, x] = element;
                 element.transform.position = new Vector3(x * spacing - offsetX, y * spacing - offsetY, 0);
