@@ -42,6 +42,7 @@ public class GridManager : MonoBehaviour
         {
             SelectElement();
         }
+        MoveObjectsDownwards();
     }
 
     void SelectElement()
@@ -79,28 +80,36 @@ public class GridManager : MonoBehaviour
 
     void MoveObjectsDownwards()
     {
-        // 从顶部开始遍历二维数组
-        for (int i = 1; i < rows; i++)
+        bool flag = true;
+        while (flag)
         {
-            for (int j = 0; j < columns; j++)
+            flag = false;
+            // 从顶部开始遍历二维数组
+            for (int i = 1; i < rows; i++)
             {
-                // 如果当前游戏对象不为空且下一行的游戏对象为空，则向下移动
-                if (gameObjects[i, j] != null && gameObjects[i - 1, j] == null)
+                for (int j = 0; j < columns; j++)
                 {
-                    // 移动当前游戏对象到下一行
-                    gameObjects[i - 1, j] = gameObjects[i, j];
-                    gameObjects[i, j] = null;
-
-                    // 更新游戏对象的位置（示例：将位置向下移动）
-                    if (gameObjects[i -1 , j] != null)
+                    // 如果当前游戏对象不为空且下一行的游戏对象为空，则向下移动
+                    if (gameObjects[i, j] != null && gameObjects[i - 1, j] == null)
                     {
-                        Vector3 newPosition = gameObjects[i - 1, j].transform.position;
-                        newPosition.y -= 1.0f; // 示例：向下移动一个单位
-                        gameObjects[i - 1, j].transform.position = newPosition;
+                        flag = true;
+                        // 移动当前游戏对象到下一行
+                        gameObjects[i - 1, j] = gameObjects[i, j];
+                        gameObjects[i, j] = null;
+
+                        // 更新游戏对象的位置（示例：将位置向下移动）
+                        if (gameObjects[i - 1, j] != null)
+                        {
+                            Vector3 newPosition = gameObjects[i - 1, j].transform.position;
+                            newPosition.y -= 1.0f; // 示例：向下移动一个单位
+                            gameObjects[i - 1, j].transform.position = newPosition;
+                        }
                     }
                 }
             }
         }
+        
+       
     }
 
     Point FindEle(GameObject gameObject)
@@ -133,23 +142,22 @@ public class GridManager : MonoBehaviour
         List<Point> objectsToDestroyV = new List<Point>(); // 竖直待销毁
 
         Point point = FindEle(gameObject);
-        Point addX = new Point(1, 0);
         bool des = false;
         int r , c;
         r = point.X; c = point.Y;
 
-        for (int i = c + 1; c < columns; c++)
+        for (int i = c + 1; i < columns; i++)
         {
-            Point newPoint = new Point(r, c);
+            Point newPoint = new Point(r, i);
             if (getEle(newPoint)!=null&&getEle(newPoint).tag == gameObject.tag)
             {
                 objectsToDestroyH.Add(newPoint);
             }
             else break;
         }
-        for (int i = c -1; c > -1; c--)
+        for (int i = c -1; i > -1; i--)
         {
-            Point newPoint = new Point(r, c);
+            Point newPoint = new Point(r, i);
             if (getEle(newPoint) != null&&getEle(newPoint).tag == gameObject.tag)
             {
                 objectsToDestroyH.Add(newPoint);
@@ -157,22 +165,10 @@ public class GridManager : MonoBehaviour
             else break;
         }
 
-        
-
-        if (objectsToDestroyH.Count >= 2)
-        {
-            des = true;
-            // 遍历列表中的每个对象，并销毁它
-            foreach (Point p in objectsToDestroyH)
-            {
-                desEle(p);
-            }
-        }
-
 
         for (int i = r + 1; i < rows; i++)
         {
-            Point newPoint = new Point(r, c);
+            Point newPoint = new Point(i, c);
             if (getEle(newPoint) != null&&getEle(newPoint).tag == gameObject.tag)
             {
                 objectsToDestroyH.Add(newPoint);
@@ -182,7 +178,7 @@ public class GridManager : MonoBehaviour
 
         for (int i = r - 1; i > -1; i--)
         {
-            Point newPoint = new Point(r, c);
+            Point newPoint = new Point(i, c);
             if (getEle(newPoint) != null&&getEle(newPoint).tag == gameObject.tag)
             {
                 objectsToDestroyH.Add(newPoint);
@@ -190,6 +186,18 @@ public class GridManager : MonoBehaviour
             else break;
         }
 
+        if (objectsToDestroyH.Count >= 2)
+        {
+            des = true;
+            // 遍历列表中的每个对象，并销毁它
+            foreach (Point p in objectsToDestroyH)
+            {
+                desEle(p);
+                // 增加分数
+                int score = int.Parse(scoreText.text.Substring(6)) + 1;
+                scoreText.SetText(string.Concat("Score:", score.ToString()));
+            }
+        }
         if (objectsToDestroyV.Count >= 2)
         {
             des = true;
@@ -197,8 +205,6 @@ public class GridManager : MonoBehaviour
             foreach (Point p in objectsToDestroyH)
             {
                 desEle(p);
-                if(obj!=null) 
-                Destroy(obj);
                 // 增加分数
                 int score = int.Parse(scoreText.text.Substring(6)) + 1;
                 scoreText.SetText(string.Concat("Score:", score.ToString()));
