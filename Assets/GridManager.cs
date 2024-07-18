@@ -18,6 +18,7 @@ public class GridManager : MonoBehaviour
     void Start()
     {
         GenerateGrid();
+
     }
 
     private void Update()
@@ -50,6 +51,8 @@ public class GridManager : MonoBehaviour
                     if(secondSelected != null)
                     CheckAndDestroy(secondSelected);
 
+                    
+                    MoveObjectsDownwards();
 
                 }
                 firstSelected.GetComponent<SpriteRenderer>().color = originalColor;
@@ -58,6 +61,33 @@ public class GridManager : MonoBehaviour
             }
         }
     }
+
+    void MoveObjectsDownwards()
+    {
+        // 从顶部开始遍历二维数组
+        for (int i = 1; i < rows; i++)
+        {
+            for (int j = 0; j < columns; j++)
+            {
+                // 如果当前游戏对象不为空且下一行的游戏对象为空，则向下移动
+                if (gameObjects[i, j] != null && gameObjects[i - 1, j] == null)
+                {
+                    // 移动当前游戏对象到下一行
+                    gameObjects[i - 1, j] = gameObjects[i, j];
+                    gameObjects[i, j] = null;
+
+                    // 更新游戏对象的位置（示例：将位置向下移动）
+                    if (gameObjects[i -1 , j] != null)
+                    {
+                        Vector3 newPosition = gameObjects[i - 1, j].transform.position;
+                        newPosition.y -= 1.0f; // 示例：向下移动一个单位
+                        gameObjects[i - 1, j].transform.position = newPosition;
+                    }
+                }
+            }
+        }
+    }
+
     Point FindEle(GameObject gameObject)
     {
         int r = 0, c = 0;
@@ -74,75 +104,84 @@ public class GridManager : MonoBehaviour
         }
         return new Point(r, c);
     }
+    void desEle(Point point)
+    {
+        Destroy(gameObjects[point.X,point.Y]);
+    }
+    GameObject getEle(Point point)
+    {
+        return gameObjects[point.X, point.Y];
+    }
     void CheckAndDestroy(GameObject gameObject)
     {
-        List<GameObject> objectsToDestroyH = new List<GameObject>(); // 水平待销毁
-        List<GameObject> objectsToDestroyV = new List<GameObject>(); // 竖直待销毁
+        List<Point> objectsToDestroyH = new List<Point>(); // 水平待销毁
+        List<Point> objectsToDestroyV = new List<Point>(); // 竖直待销毁
 
         Point point = FindEle(gameObject);
+        Point addX = new Point(1, 0);
+        bool des = false;
         int r , c;
         r = point.X; c = point.Y;
 
-        if (c+1<12 && gameObjects[r,c+1].gameObject.tag == gameObject.tag)
+        for (int i = c + 1; c < columns; c++)
         {
-            objectsToDestroyH.Add(gameObjects[r, c + 1].gameObject);
-            if(c+2<12 && gameObjects[r, c + 2].gameObject.tag == gameObject.tag)
+            Point newPoint = new Point(r, c);
+            if (getEle(newPoint)!=null&&getEle(newPoint).tag == gameObject.tag)
             {
-                objectsToDestroyH.Add(gameObjects[r, c + 2].gameObject);
+                objectsToDestroyH.Add(newPoint);
             }
+            else break;
+        }
+        for (int i = c -1; c > -1; c--)
+        {
+            Point newPoint = new Point(r, c);
+            if (getEle(newPoint) != null&&getEle(newPoint).tag == gameObject.tag)
+            {
+                objectsToDestroyH.Add(newPoint);
+            }
+            else break;
         }
 
-        if (c - 1 > -1 && gameObjects[r, c - 1].gameObject.tag == gameObject.tag)
-        {
-            objectsToDestroyH.Add(gameObjects[r, c - 1].gameObject);
-            if (c - 2 > -1 && gameObjects[r, c - 2].gameObject.tag == gameObject.tag)
-            {
-                objectsToDestroyH.Add(gameObjects[r, c - 2].gameObject);
-            }
-        }
-
-
-
-        bool des = false;
+        
 
         if (objectsToDestroyH.Count >= 2)
         {
             des = true;
             // 遍历列表中的每个对象，并销毁它
-            foreach (GameObject obj in objectsToDestroyH)
+            foreach (Point p in objectsToDestroyH)
             {
-                if (obj != null)
-                    Destroy(obj);
+                desEle(p);
             }
         }
 
 
-
-        if (r + 1 < 12 && gameObjects[r + 1, c].gameObject.tag == gameObject.tag)
+        for (int i = r + 1; i < rows; i++)
         {
-            objectsToDestroyV.Add(gameObjects[r + 1, c].gameObject);
-            if (r + 2 < 12 && gameObjects[r + 2, c].gameObject.tag == gameObject.tag)
+            Point newPoint = new Point(r, c);
+            if (getEle(newPoint) != null&&getEle(newPoint).tag == gameObject.tag)
             {
-                objectsToDestroyV.Add(gameObjects[r + 2, c].gameObject);
+                objectsToDestroyH.Add(newPoint);
             }
+            else break;
         }
 
-        if (r - 1 >-1 && gameObjects[r - 1, c].gameObject.tag == gameObject.tag)
+        for (int i = r - 1; i > -1; i--)
         {
-            objectsToDestroyV.Add(gameObjects[r - 1, c].gameObject);
-            if (r - 2 >-1 && gameObjects[r- 2, c].gameObject.tag == gameObject.tag)
+            Point newPoint = new Point(r, c);
+            if (getEle(newPoint) != null&&getEle(newPoint).tag == gameObject.tag)
             {
-                objectsToDestroyV.Add(gameObjects[r- 2, c].gameObject);
+                objectsToDestroyH.Add(newPoint);
             }
+            else break;
         }
+
         if (objectsToDestroyV.Count >= 2)
         {
             des = true;
             // 遍历列表中的每个对象，并销毁它
-            foreach (GameObject obj in objectsToDestroyV)
+            foreach (Point p in objectsToDestroyH)
             {
-                if(obj!=null) 
-                Destroy(obj);
+                desEle(p);
             }
         }
 
